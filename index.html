@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>興嘉國小｜領域會議紀錄系統</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root{--blue:#1f4e9a;--blue2:#2f6fd0;--lbl:#eef2f8;--sec:#d6e2f3;--line:#7f8fa6;--bg:#f4f6fa;--ink:#1d2433;--mute:#6b7487;--yellow:#ffd400;--ok:#1e8e5a;--warn:#c77700;--bad:#c0392b}
+*{box-sizing:border-box}
+body{margin:0;font-family:"微軟正黑體","Microsoft JhengHei","Noto Sans TC","PingFang TC",sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+button,input,select,textarea{font:inherit;color:inherit}
+.hidden{display:none!important}
+header.top{background:#fff;border-bottom:4px solid var(--yellow);display:flex;align-items:center;gap:16px;padding:10px 20px;position:sticky;top:0;z-index:20}
+header.top img{height:44px}
+header.top .t{font-weight:700;color:var(--blue);font-size:19px}
+header.top .sp{flex:1}
+header.top .who{color:var(--mute);font-size:14px}
+.demo-badge{background:#fff3c4;color:#7a5b00;border-radius:20px;padding:2px 10px;font-size:12px}
+main{max-width:1180px;margin:0 auto;padding:20px}
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(20,40,80,.08);padding:18px 20px;margin-bottom:16px}
+h2{margin:0 0 12px;color:var(--blue);font-size:19px}
+h3{margin:0 0 10px;font-size:16px;color:var(--blue)}
+.btn{border:1px solid #c9d3e3;background:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#f0f4fb}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.pri:hover{background:#173e7c}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.danger{color:var(--bad);border-color:#efc5c0}
+.btn.sm{padding:4px 10px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grow{flex:1}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mute)}
+label.f>input,label.f>select,label.f>textarea{color:var(--ink)}
+input[type=text],input[type=password],input[type=number],input[type=date],input[type=time],input[type=url],select,textarea{border:1px solid #c9d3e3;border-radius:8px;padding:7px 10px;background:#fff;width:100%}
+textarea{resize:vertical;min-height:80px;line-height:1.6}
+input:focus,select:focus,textarea:focus{outline:2px solid #b8cdf0;border-color:var(--blue2)}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:760px){.g2,.g3,.g4{grid-template-columns:1fr 1fr}}
+table.list{width:100%;border-collapse:collapse}
+table.list th,table.list td{padding:9px 8px;border-bottom:1px solid #e6ebf3;text-align:left;font-size:14px;vertical-align:middle}
+table.list th{color:var(--mute);font-weight:600;background:#f8fafd}
+table.list tr:hover td{background:#fafcff}
+.tag{display:inline-block;border-radius:20px;padding:2px 9px;font-size:12px;background:#eef1f6;color:#4a5468}
+.tag.draft{background:#fff3c4;color:#7a5b00}
+.tag.sent{background:#e1edff;color:var(--blue)}
+.tag.done{background:#dcf5e8;color:var(--ok)}
+.dots{display:inline-flex;gap:3px;vertical-align:middle}
+.dots i{width:9px;height:9px;border-radius:50%;background:#dde3ec;display:inline-block}
+.dots i.on{background:var(--ok)}
+.muted{color:var(--mute);font-size:13px}
+.empty{padding:40px;text-align:center;color:var(--mute)}
+/* login */
+.login{max-width:420px;margin:60px auto}
+.login .logo{text-align:center;margin-bottom:10px}.login .logo img{height:64px}
+.seg{display:flex;border:1px solid #c9d3e3;border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;background:#fff;padding:9px;cursor:pointer}
+.seg button.on{background:var(--blue);color:#fff}
+/* editor */
+.sec-title{background:var(--sec);color:var(--blue);font-weight:700;padding:8px 12px;border-radius:8px;margin:18px 0 12px}
+.prop{border:1px solid #dbe3f0;border-radius:10px;padding:14px;margin-bottom:12px;background:#fbfcfe}
+.prop .ph{display:flex;align-items:center;margin-bottom:10px;font-weight:700}
+.chips{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
+.chips label{display:flex;gap:5px;align-items:center;cursor:pointer}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.photo{border:1px solid #dbe3f0;border-radius:10px;overflow:hidden;background:#fff}
+.photo .im{height:150px;background:#eef1f6 center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:13px}
+.photo .cap{padding:8px;display:flex;gap:6px}
+.addph{border:2px dashed #c9d3e3;border-radius:10px;min-height:190px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--mute);background:#fff}
+.addph:hover{border-color:var(--blue2);color:var(--blue2)}
+.sticky-actions{position:sticky;bottom:0;background:rgba(244,246,250,.95);padding:12px 0;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #dde3ec;margin-top:10px}
+.lockbar{background:#fff3c4;color:#7a5b00;padding:10px 14px;border-radius:8px;margin-bottom:12px}
+/* overview */
+.ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.ov .d{border:1px solid #dbe3f0;border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff}
+.ov .d:hover{border-color:var(--blue2)}
+.ov .d.sel{outline:2px solid var(--blue2)}
+.ov .d b{display:block;color:var(--blue);margin-bottom:4px}
+.ov .n{font-size:12px;color:var(--mute);line-height:1.6}
+.ov .zero{background:#fff7f5;border-color:#f3d2cc}
+/* modal & toast */
+.mask{position:fixed;inset:0;background:rgba(15,25,45,.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal{background:#fff;border-radius:14px;max-width:440px;width:100%;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.modal h3{margin-top:0}
+.modal .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#1d2433;color:#fff;padding:10px 18px;border-radius:10px;z-index:200;opacity:0;transition:.25s;pointer-events:none}
+#toast.show{opacity:1}
+#busy{position:fixed;inset:0;background:rgba(255,255,255,.6);z-index:150;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--blue)}
+/* ===== 紀錄表（檢視／PDF） ===== */
+.sheet{background:#fff;width:760px;margin:0 auto;padding:0;color:#000;font-size:13.5px;line-height:1.55}
+.sheet .hd{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--yellow);padding-bottom:6px;margin-bottom:10px}
+.sheet .hd img{height:62px}
+.sheet .hd span{color:var(--blue);font-size:20px;letter-spacing:2px}
+.sheet .ttl{text-align:center;color:var(--blue);font-weight:700;font-size:17px;margin:4px 0 10px}
+.sheet table{width:100%;border-collapse:collapse;table-layout:fixed}
+.sheet td{border:1px solid var(--line);padding:5px 8px;vertical-align:top;word-break:break-word}
+.sheet td.l{background:var(--lbl);font-weight:700;text-align:center;vertical-align:middle;width:110px}
+.sheet td.s{background:var(--sec);color:var(--blue);font-weight:700;font-size:14.5px}
+.sheet td.p{background:#f7f9fc;font-weight:700}
+.sheet .pre{white-space:pre-wrap;min-height:1.5em}
+.sheet .tall{min-height:60px}
+.sheet .sig{height:64px;vertical-align:middle;text-align:center;color:#555}
+.sheet .stamp{display:inline-block;border:2px solid #c0392b;color:#c0392b;border-radius:6px;padding:2px 10px;font-weight:700;transform:rotate(-4deg)}
+.sheet .stamp small{display:block;font-weight:400;font-size:11px}
+.sheet .phgrid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-top:0}
+.sheet .phc{border-top:1px solid var(--line);page-break-inside:avoid}
+.sheet .phc:nth-child(odd){border-right:1px solid var(--line)}
+.sheet .phc .pi{height:250px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa}
+.sheet .phc .pi img{max-width:100%;max-height:250px}
+.sheet .phc .pc{background:var(--lbl);padding:5px 8px;border-top:1px solid var(--line);font-size:12.5px}
+.sheet .signimg img{max-width:100%;display:block;margin:4px 0}
+.sheet .notes{font-size:12px;color:#333;margin-top:10px;line-height:1.6}
+.sheet .gap{height:12px}
+.pagebreak{page-break-before:always;height:0}
+.viewwrap{background:#e9edf3;padding:20px;border-radius:12px;overflow:auto}
+.viewwrap .sheet{padding:30px 34px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.pdfwrap .sheet{padding:0;width:auto}
+@media print{
+  body{background:#fff}
+  header.top,.noprint,.sticky-actions{display:none!important}
+  main{padding:0;max-width:none}
+  .card{box-shadow:none;padding:0}
+  .viewwrap{background:#fff;padding:0}
+  .viewwrap .sheet{box-shadow:none;padding:0;width:auto}
+  @page{size:A4;margin:12mm 12mm}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <img src="data:image/jpeg;base64,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/B3QNZ+J/jTS/EGo6pI0VjdeG7V5f7Vyx2GGFNxJ2ld2OAe/Iqr8YPBHxb8V6hc2nhiTwBrPhq8tRC+j+LLGSQ20uGBmikjBySCOD0I4rgNI/Zd8XeC/A3w5ufCXirSbzxb4NvLu7C6pFJ9huhc/6yIbcugGOGxnJJ44wtbj0sbPjf8AaEfS/id8Lb3S7nUrLwlrw1IalZXOkSC8leBVWNFhZPNDeYcAKPmyOorvrf8AaD+Ftz8KV+IK67MmlNenTBA9pILo3ecfZxBjeZOQdoHTnpWJefDf4jeJ/jD8MfiB4quPDMFz4aOo/wBoW2mvMUZZ0CRCIuuWIA+Ynb7VxB/Zn8XL4bu7i213RotfsvH83jTR9/mPayK5XEM+FDKSF6qDj3zRqHunrulfHL4can4a8Q61cavPo6eHADrFrrFrJaXNiGGVLxON3zfw4ByTgc1l2vx38IeJtH1qx8P3Gp6br8GizatZWmsadLZyXMIjYrPEsqgSJkDp+IrgNZ/Zr8S/EK0+JOt+Ote0vTvEPjC2tLa3g0gSS2tgtqVaPczhWlLMg3cDAzitOD4MfEXxP8RLbxr4+1Hw3a3mkeGbnQNNtdGaZ0nkmjZGnmZ1UqMNwig49eOTULI734A+Ldd8d/s2+EvFvia6S61bUbQy3MyRrGHYSOuQqgAcAdK9Irgvgr4H1P4b/ATwz4H1m5tbm/0q2MM01qWMTEuzZUsAcYYdRXe00S9wooopiCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACggEEEZBoooA8j0/wDZo+EFjftdyeHZr5yxfbeXcjoCTn7oIB/GvTtK0bSNC09bDRdLs9OtV6Q2sKxL+SgVeorariKtX+JJv1ZnClCHwxSCiiisTQKKKKACiiigAoIBGCMj0oooAzZtB0me5S4ayjWVGDho/l5BzzjrWlRRXLh8Dh8NKUqFNRct7JK/rbcudSc0lJ3sFFFFdRAUUUUAIyq6FHUMrDBUjIIqjp2iaLpDSNpOkWFgZTmQ2tukW8++0DNX6KACiiigAooooAKKKKACiiigAooooAKKKKACiiigCO4t7e7tnt7qCOeFxho5VDKw9weDTkRI4ljjRURQFVVGAAOgAp1FABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH//2Q==" alt="興嘉國小">
+  <div class="t">領域會議紀錄系統</div>
+  <span id="demoBadge" class="demo-badge hidden">示範模式（資料只存在本機瀏覽器）</span>
+  <div class="sp"></div>
+  <div id="whoBox" class="row hidden">
+    <span class="who" id="who"></span>
+    <button class="btn sm" id="btnAcc">帳號管理</button>
+    <button class="btn sm" id="btnOut">登出</button>
+  </div>
+</header>
+<main id="app"></main>
+<div id="toast"></div>
+<div id="busy" class="hidden">處理中…</div>
+
+<script>
+/* ================= 設定 ================= */
+// 部署 Code.gs 後，把網頁應用程式網址貼在這裡；留空則進入「示範模式」
+const API_URL = 'https://script.google.com/macros/s/AKfycbwyiiKx3MtEcfjxSvtkyKbP_EN3BG3saqkB0zLn5ySbDOiAwhLvrOhjapt7HZ_aSl__/exec';
+const LOGO = 'data:image/jpeg;base64,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/B3QNZ+J/jTS/EGo6pI0VjdeG7V5f7Vyx2GGFNxJ2ld2OAe/Iqr8YPBHxb8V6hc2nhiTwBrPhq8tRC+j+LLGSQ20uGBmikjBySCOD0I4rgNI/Zd8XeC/A3w5ufCXirSbzxb4NvLu7C6pFJ9huhc/6yIbcugGOGxnJJ44wtbj0sbPjf8AaEfS/id8Lb3S7nUrLwlrw1IalZXOkSC8leBVWNFhZPNDeYcAKPmyOorvrf8AaD+Ftz8KV+IK67MmlNenTBA9pILo3ecfZxBjeZOQdoHTnpWJefDf4jeJ/jD8MfiB4quPDMFz4aOo/wBoW2mvMUZZ0CRCIuuWIA+Ynb7VxB/Zn8XL4bu7i213RotfsvH83jTR9/mPayK5XEM+FDKSF6qDj3zRqHunrulfHL4can4a8Q61cavPo6eHADrFrrFrJaXNiGGVLxON3zfw4ByTgc1l2vx38IeJtH1qx8P3Gp6br8GizatZWmsadLZyXMIjYrPEsqgSJkDp+IrgNZ/Zr8S/EK0+JOt+Ote0vTvEPjC2tLa3g0gSS2tgtqVaPczhWlLMg3cDAzitOD4MfEXxP8RLbxr4+1Hw3a3mkeGbnQNNtdGaZ0nkmjZGnmZ1UqMNwig49eOTULI734A+Ldd8d/s2+EvFvia6S61bUbQy3MyRrGHYSOuQqgAcAdK9Irgvgr4H1P4b/ATwz4H1m5tbm/0q2MM01qWMTEuzZUsAcYYdRXe00S9wooopiCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACggEEEZBoooA8j0/wDZo+EFjftdyeHZr5yxfbeXcjoCTn7oIB/GvTtK0bSNC09bDRdLs9OtV6Q2sKxL+SgVeorariKtX+JJv1ZnClCHwxSCiiisTQKKKKACiiigAoIBGCMj0oooAzZtB0me5S4ayjWVGDho/l5BzzjrWlRRXLh8Dh8NKUqFNRct7JK/rbcudSc0lJ3sFFFFdRAUUUUAIyq6FHUMrDBUjIIqjp2iaLpDSNpOkWFgZTmQ2tukW8++0DNX6KACiiigAooooAKKKKACiiigAooooAKKKKACiiigCO4t7e7tnt7qCOeFxho5VDKw9weDTkRI4ljjRURQFVVGAAOgAp1FABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH//2Q==';
+const NOTES = [
+  '一、本會議由領域召集人負責召集，依據週三進修安排之領域會議期程進行。',
+  '二、本會議得由各領域成員輪流分別擔任主席與紀錄。',
+  '三、會議時各教師應就學期訂定教學研究相關主題口頭或書面討論，相關資料可以補充形式附件於後。',
+  '四、會議紀錄於會議【結束後一週內】完成填報並送出，經處室回饋及核章後歸檔。',
+];
+const OFFICE_ORDER = ['教務處', '學務處', '總務處', '輔導室'];
+const ADMIN_ORDER = ['課程組', '教務主任', '校長'];
+const DEMO = !API_URL;
+
+/* ================= 小工具 ================= */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const app = $('#app');
+function toast(msg, ms = 2200) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), ms); }
+function busy(on, text = '處理中…') { const b = $('#busy'); b.textContent = text; b.classList.toggle('hidden', !on); }
+async function sha256(s) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+function rocNow() {
+  const d = new Date(), y = d.getFullYear(), m = d.getMonth() + 1;
+  if (m >= 8) return { year: y - 1911, term: 1 };
+  if (m === 1) return { year: y - 1912, term: 1 };
+  return { year: y - 1912, term: 2 };
+}
+function fmtDate(s) { if (!s) return ''; const d = new Date(s); if (isNaN(d)) return s; return `${d.getFullYear() - 1911}/${d.getMonth() + 1}/${d.getDate()}`; }
+function fmtDT(s) { if (!s) return ''; const d = new Date(s); if (isNaN(d)) return s; return `${d.getFullYear() - 1911}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
+function rocDateText(s) {
+  if (!s) return '　　年　　月　　日';
+  const d = new Date(s + 'T00:00:00'); if (isNaN(d)) return esc(s);
+  return `${d.getFullYear() - 1911} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日（星期${'日一二三四五六'[d.getDay()]}）`;
+}
+
+function modal({ title, html = '', ok = '確定', cancel = '取消', danger = false, onOpen }) {
+  return new Promise(res => {
+    const m = document.createElement('div'); m.className = 'mask';
+    m.innerHTML = `<div class="modal"><h3>${esc(title)}</h3><div>${html}</div><div class="acts">${cancel ? `<button class="btn" data-x>${esc(cancel)}</button>` : ''}<button class="btn ${danger ? 'danger' : 'pri'}" data-ok>${esc(ok)}</button></div></div>`;
+    document.body.appendChild(m);
+    const close = v => { m.remove(); res(v); };
+    m.querySelector('[data-ok]').onclick = () => close(m);
+    const x = m.querySelector('[data-x]'); if (x) x.onclick = () => close(null);
+    m.addEventListener('keydown', e => { if (e.key === 'Escape') close(null); });
+    onOpen && onOpen(m);
+    (m.querySelector('input,select,textarea') || m.querySelector('[data-ok]')).focus();
+  });
+}
+const confirmBox = (title, text, opt = {}) => modal({ title, html: `<p>${esc(text)}</p>`, ...opt }).then(Boolean);
+
+/* ================= API ================= */
+async function api(action, payload = {}) {
+  const body = { action, token: S.token, ...payload };
+  let res;
+  if (DEMO) res = await Mock.call(body);
+  else {
+    const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+    res = await r.json();
+  }
+  if (!res.ok) {
+    if (/登入逾時/.test(res.error)) { logout(true); }
+    throw new Error(res.error);
+  }
+  return res.data;
+}
+async function run(fn, text) {
+  busy(true, text);
+  try { return await fn(); }
+  catch (e) { toast('⚠ ' + e.message, 3500); throw e; }
+  finally { busy(false); }
+}
+
+/* ================= 示範模式後端（與 Code.gs 同邏輯） ================= */
+const Mock = (() => {
+  const KEY = 'xj_meeting_demo_v1';
+  const DOMAINS = ['國語文', '本土語文', '英語文', '數學', '社會', '自然科學', '藝術', '綜合活動', '健康與體育', '生活課程', '資訊科技'];
+  let db;
+  async function load() {
+    if (db) return db;
+    try { db = JSON.parse(localStorage.getItem(KEY)); } catch (e) { db = null; }
+    if (!db) {
+      const h = await sha256('sces1234');
+      db = { accounts: [], records: [], photos: {}, tokens: {} };
+      DOMAINS.forEach(n => db.accounts.push({ role: '領域', name: n, hash: h }));
+      OFFICE_ORDER.forEach(n => db.accounts.push({ role: '處室', name: n, hash: h }));
+      ADMIN_ORDER.forEach(n => db.accounts.push({ role: '管理者', name: n, hash: h }));
+      const { year, term } = rocNow();
+      db.records.push({ id: 'M0001', domain: '數學', year, term, no: '1', date: '2026-09-16', timeStart: '13:40', timeEnd: '15:30', placeType: '實體', place: '三樓會議室', link: '', chair: '王小明', recorder: '陳美玲', expected: '8', present: '7', leaveN: '1', absentN: '0', attendees: '王小明、陳美玲、林志豪、張雅婷、李建宏、黃淑芬、吳宗翰', leaves: '劉怡君（公假）', absents: '', signSheet: [], report: '1. 說明本學期數學領域教學研究主題：「數感培養與差異化教學」。\n2. 期中評量命題分工確認。', discussion: '各學年分享開學三週教學進度，四年級反映分數單元需增加具體操作時間。', proposals: [{ proposer: '林志豪', unit: '領域小組', cause: '本學期數學領域公開授課安排案', desc: '依課發會決議，每位教師每學年至少公開授課一次。', method: '由各學年推派一位教師於 11 月進行公開授課，其餘教師入班觀課。', result: '照案通過', yes: '7', no: '0', abstain: '0', decision: '照案通過，公開授課時間表於下次會議前提出。', owner: '林志豪', due: '2026-10-14' }], motions: [], endTime: '15:30', photos: [], feedback: { '教務處': { text: '公開授課時間表請於 10/14 前送課程組彙整。', by: '教務處', at: new Date().toISOString() } }, sign: {}, status: '已送出', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), updatedBy: '數學' });
+      save();
+    }
+    return db;
+  }
+  const save = () => localStorage.setItem(KEY, JSON.stringify(db));
+  const err = m => ({ ok: false, error: m });
+  const okv = d => ({ ok: true, data: JSON.parse(JSON.stringify(d)) });
+  const canEdit = (u, r) => {
+    if (u.role === '管理者') return;
+    if (u.role !== '領域' || r.domain !== u.name) throw new Error('只能修改本領域紀錄');
+    if (r.sign && Object.keys(r.sign).length) throw new Error('紀錄已進入核章，如需修改請洽課程組');
+  };
+  const find = id => { const r = db.records.find(x => x.id === id); if (!r) throw new Error('找不到紀錄'); return r; };
+  const adminOnly = u => { if (u.role !== '管理者') throw new Error('僅限管理者'); };
+  const H = {
+    meta: () => ({ domains: db.accounts.filter(a => a.role === '領域').map(a => a.name), offices: db.accounts.filter(a => a.role === '處室').map(a => a.name), admins: db.accounts.filter(a => a.role === '管理者').map(a => a.name) }),
+    login: async q => { const a = db.accounts.find(x => x.role === q.role && x.name === q.name); if (!a || a.hash !== q.hash) throw new Error('帳號或密碼錯誤'); const t = 'T' + Math.random().toString(36).slice(2); db.tokens[t] = { role: q.role, name: q.name }; save(); return { token: t, user: db.tokens[t] }; },
+    logout: q => { delete db.tokens[q.token]; save(); return true; },
+    list: (q, u) => db.records.filter(r => u.role !== '領域' || r.domain === u.name).map(r => ({ id: r.id, domain: r.domain, year: r.year, term: r.term, no: r.no, date: r.date, chair: r.chair, status: r.status, updatedAt: r.updatedAt, updatedBy: r.updatedBy, feedback: r.feedback || {}, sign: r.sign || {} })),
+    get: (q, u) => { const r = find(q.id); if (u.role === '領域' && r.domain !== u.name) throw new Error('只能查閱本領域紀錄'); return r; },
+    save: (q, u) => {
+      if (u.role === '處室') throw new Error('處室帳號僅能填寫回饋');
+      const now = new Date().toISOString(), inR = q.record;
+      if (inR.id) { const r = find(inR.id); canEdit(u, r); const keep = { id: r.id, feedback: r.feedback, sign: r.sign, createdAt: r.createdAt, domain: u.role === '管理者' && inR.domain ? inR.domain : r.domain }; Object.assign(r, inR, keep, { updatedAt: now, updatedBy: u.name }); save(); return r; }
+      const r = Object.assign({}, inR, { id: 'M' + Date.now(), domain: u.role === '領域' ? u.name : inR.domain, feedback: {}, sign: {}, status: inR.status || '草稿', createdAt: now, updatedAt: now, updatedBy: u.name });
+      if (!r.domain) throw new Error('請選擇領域');
+      db.records.push(r); save(); return r;
+    },
+    remove: (q, u) => { const r = find(q.id); canEdit(u, r); if (u.role === '領域' && r.status !== '草稿') throw new Error('已送出的紀錄請洽管理者刪除'); db.records = db.records.filter(x => x !== r); save(); return true; },
+    feedback: (q, u) => { if (u.role !== '處室' && u.role !== '管理者') throw new Error('無權限'); const office = u.role === '處室' ? u.name : q.office; const r = find(q.id); if (r.status === '草稿') throw new Error('紀錄尚未送出'); r.feedback = r.feedback || {}; if (q.text && q.text.trim()) r.feedback[office] = { text: q.text, by: u.name, at: new Date().toISOString() }; else delete r.feedback[office]; save(); return r.feedback; },
+    approve: (q, u) => { adminOnly(u); const r = find(q.id); if (r.status === '草稿') throw new Error('紀錄尚未送出'); r.sign = r.sign || {}; if (q.approve) r.sign[u.name] = { at: new Date().toISOString() }; else delete r.sign[u.name]; save(); return r.sign; },
+    uploadPhoto: (q, u) => { if (u.role === '處室') throw new Error('無權限'); const id = 'P' + Date.now() + Math.random().toString(36).slice(2, 6); db.photos[id] = q.dataUrl; try { save(); } catch (e) { delete db.photos[id]; throw new Error('示範模式儲存空間不足，請刪除部分照片'); } return { id }; },
+    photo: q => { if (!db.photos[q.id]) throw new Error('找不到照片'); return { dataUrl: db.photos[q.id] }; },
+    accounts: async (q, u) => { adminOnly(u); const h = await sha256('sces1234'); return db.accounts.map(a => ({ role: a.role, name: a.name, isDefault: a.hash === h, updatedAt: a.updatedAt || '' })); },
+    setPasswords: (q, u) => { adminOnly(u); if (!(q.items || []).length) throw new Error('沒有要設定的帳號'); const now = new Date().toISOString(); q.items.forEach(it => { const a = db.accounts.find(x => x.role === it.role && x.name === it.name); if (!a) throw new Error('找不到帳號：' + it.name); a.hash = it.newHash; a.updatedAt = now; }); save(); return q.items.length; },
+    addAccount: async (q, u) => { adminOnly(u); if (!q.name) throw new Error('資料不完整'); if (db.accounts.find(x => x.role === q.role && x.name === q.name)) throw new Error('帳號已存在'); if (!q.newHash) throw new Error('請設定密碼'); db.accounts.push({ role: q.role, name: q.name, hash: q.newHash, updatedAt: new Date().toISOString() }); save(); return true; },
+    removeAccount: (q, u) => { adminOnly(u); if (q.role === u.role && q.name === u.name) throw new Error('不能刪除自己'); db.accounts = db.accounts.filter(x => !(x.role === q.role && x.name === q.name)); save(); return true; },
+  };
+  return {
+    async call(q) {
+      await load();
+      try {
+        const fn = H[q.action]; if (!fn) return err('未知的動作');
+        let u = null;
+        if (!['meta', 'login'].includes(q.action)) { u = db.tokens[q.token]; if (!u) return err('登入逾時，請重新登入'); }
+        return okv(await fn(q, u));
+      } catch (e) { return err(e.message); }
+    },
+  };
+})();
+
+/* ================= 狀態 ================= */
+const S = {
+  token: localStorage.getItem('xj_mt_token') || '',
+  user: JSON.parse(localStorage.getItem('xj_mt_user') || 'null'),
+  meta: null, list: [],
+  filter: Object.assign({ year: '', term: '', domain: '', status: '' }, JSON.parse(localStorage.getItem('xj_mt_filter') || '{}')),
+  photoCache: {},
+};
+const isAdmin = () => S.user?.role === '管理者';
+const isOffice = () => S.user?.role === '處室';
+const isDomain = () => S.user?.role === '領域';
+const locked = r => r.sign && Object.keys(r.sign).length > 0;
+
+function setHeader() {
+  $('#demoBadge').classList.toggle('hidden', !DEMO);
+  $('#whoBox').classList.toggle('hidden', !S.user);
+  if (S.user) { $('#who').textContent = `${S.user.role}｜${S.user.name}`; $('#btnAcc').classList.toggle('hidden', !isAdmin()); }
+}
+function logout(silent) {
+  if (S.token && !silent) api('logout').catch(() => { });
+  S.token = ''; S.user = null; localStorage.removeItem('xj_mt_token'); localStorage.removeItem('xj_mt_user');
+  setHeader(); showLogin();
+}
+$('#btnOut').onclick = () => logout();
+$('#btnAcc').onclick = showAccounts;
+
+/* ================= 登入 ================= */
+async function showLogin() {
+  setHeader();
+  app.innerHTML = `<div class="card login">
+    <div class="logo"><img src="${LOGO}"></div>
+    <h2 style="text-align:center">領域會議紀錄系統</h2>
+    <div class="seg" id="roleSeg">${['領域', '處室', '管理者'].map(r => `<button data-r="${r}">${r}</button>`).join('')}</div>
+    <div class="grid" style="margin-top:14px">
+      <label class="f">帳號<select id="lgName"></select></label>
+      <label class="f">密碼<input type="password" id="lgPw" autocomplete="current-password"></label>
+      <button class="btn pri" id="lgGo">登入</button>
+      <p class="muted" style="margin:0">密碼由管理者設定，忘記密碼請洽課程組。</p>
+    </div></div>`;
+  try { S.meta = S.meta || await api('meta'); } catch (e) { $('#lgName').innerHTML = `<option>無法連線：${esc(e.message)}</option>`; return; }
+  let role = localStorage.getItem('xj_mt_role') || '領域';
+  const fill = () => {
+    $$('#roleSeg button').forEach(b => b.classList.toggle('on', b.dataset.r === role));
+    const list = role === '領域' ? S.meta.domains : role === '處室' ? S.meta.offices : S.meta.admins;
+    const last = localStorage.getItem('xj_mt_name');
+    $('#lgName').innerHTML = list.map(n => `<option ${n === last ? 'selected' : ''}>${esc(n)}</option>`).join('');
+  };
+  $$('#roleSeg button').forEach(b => b.onclick = () => { role = b.dataset.r; fill(); });
+  fill();
+  const go = async () => {
+    const name = $('#lgName').value, pw = $('#lgPw').value;
+    if (!pw) return toast('請輸入密碼');
+    const r = await run(async () => api('login', { role, name, hash: await sha256(pw) }), '登入中…');
+    S.token = r.token; S.user = r.user;
+    localStorage.setItem('xj_mt_token', r.token); localStorage.setItem('xj_mt_user', JSON.stringify(r.user));
+    localStorage.setItem('xj_mt_role', role); localStorage.setItem('xj_mt_name', name);
+    setHeader();
+    showList();
+  };
+  $('#lgGo').onclick = () => go().catch(() => { });
+  $('#lgPw').onkeydown = e => { if (e.key === 'Enter') go().catch(() => { }); };
+}
+
+/* ================= 列表 ================= */
+function statusOf(r) {
+  if (r.status === '草稿') return { t: '草稿', c: 'draft' };
+  const n = Object.keys(r.sign || {}).length;
+  if (n >= ADMIN_ORDER.length) return { t: '已核章', c: 'done' };
+  if (n > 0) return { t: `核章中 ${n}/3`, c: 'sent' };
+  return { t: '已送出', c: 'sent' };
+}
+const dots = (obj, keys) => `<span class="dots" title="${keys.map(k => k + (obj[k] ? '✓' : '—')).join('　')}">${keys.map(k => `<i class="${obj[k] ? 'on' : ''}"></i>`).join('')}</span>`;
+
+function filtered() {
+  const f = S.filter;
+  return S.list.filter(r => (!f.year || String(r.year) === String(f.year)) && (!f.term || String(r.term) === String(f.term)) && (!f.domain || r.domain === f.domain) && (!f.status || statusOf(r).t.startsWith(f.status)))
+    .sort((a, b) => (b.year - a.year) || (b.term - a.term) || a.domain.localeCompare(b.domain, 'zh-Hant') || (Number(a.no) - Number(b.no)));
+}
+
+async function showList(reload = true) {
+  if (reload) { S.list = await run(() => api('list'), '讀取紀錄…'); }
+  const years = [...new Set(S.list.map(r => String(r.year)).concat(String(rocNow().year)))].sort((a, b) => b - a);
+  const f = S.filter;
+  const domains = S.meta?.domains || [...new Set(S.list.map(r => r.domain))];
+  const rows = filtered();
+  app.innerHTML = `
+  ${isAdmin() || isOffice() ? `<div class="card"><div class="row" style="margin-bottom:10px"><h2 style="margin:0">各領域填報概況</h2><span class="muted">${f.year ? f.year + '學年度' : '全部學年'}${f.term ? '第' + f.term + '學期' : ''}・點選領域可篩選</span></div><div class="ov" id="ov"></div></div>` : ''}
+  <div class="card">
+    <div class="row" style="margin-bottom:12px">
+      <h2 style="margin:0">${isDomain() ? esc(S.user.name) + '領域　' : ''}會議紀錄</h2><div class="grow"></div>
+      ${isAdmin() ? `<button class="btn" id="btnBatch">📄 匯出篩選結果 PDF（${rows.length}）</button>` : ''}
+      ${!isOffice() ? `<button class="btn pri" id="btnNew">＋ 新增會議紀錄</button>` : ''}
+    </div>
+    <div class="row" style="margin-bottom:10px">
+      <select id="fYear" style="width:auto"><option value="">全部學年度</option>${years.map(y => `<option ${y == f.year ? 'selected' : ''}>${y}</option>`).join('')}</select>
+      <select id="fTerm" style="width:auto"><option value="">全部學期</option><option value="1" ${f.term == 1 ? 'selected' : ''}>第1學期</option><option value="2" ${f.term == 2 ? 'selected' : ''}>第2學期</option></select>
+      ${!isDomain() ? `<select id="fDomain" style="width:auto"><option value="">全部領域</option>${domains.map(d => `<option ${d === f.domain ? 'selected' : ''}>${esc(d)}</option>`).join('')}</select>` : ''}
+      <select id="fStatus" style="width:auto"><option value="">全部狀態</option>${['草稿', '已送出', '核章中', '已核章'].map(s => `<option ${s === f.status ? 'selected' : ''}>${s}</option>`).join('')}</select>
+      <button class="btn sm" id="fReload">重新整理</button>
+    </div>
+    ${rows.length ? `<div style="overflow:auto"><table class="list"><thead><tr><th>學年度／學期</th><th>領域</th><th>次別</th><th>開會日期</th><th>主席</th><th>狀態</th><th>處室回饋</th><th>核章</th><th>最後修改</th><th></th></tr></thead><tbody>
+    ${rows.map(r => { const st = statusOf(r); const canE = isAdmin() || (isDomain() && !locked(r)); return `<tr>
+      <td>${esc(r.year)}-${esc(r.term)}</td><td>${esc(r.domain)}</td><td>第 ${esc(r.no)} 次</td><td>${fmtDate(r.date)}</td><td>${esc(r.chair)}</td>
+      <td><span class="tag ${st.c}">${st.t}</span>${isOffice() && r.status !== '草稿' && !(r.feedback || {})[S.user.name] ? ' <span class="tag draft">待回饋</span>' : ''}</td>
+      <td>${dots(r.feedback || {}, OFFICE_ORDER)}</td><td>${dots(r.sign || {}, ADMIN_ORDER)}</td>
+      <td class="muted">${fmtDT(r.updatedAt)}<br>${esc(r.updatedBy)}</td>
+      <td style="white-space:nowrap"><button class="btn sm" data-v="${r.id}">檢視</button> ${canE ? `<button class="btn sm" data-e="${r.id}">編輯</button>` : ''} <button class="btn sm" data-pdf="${r.id}">PDF</button></td></tr>`; }).join('')}
+    </tbody></table></div>` : `<div class="empty">目前沒有符合條件的紀錄${!isOffice() ? '，點「新增會議紀錄」開始填寫' : ''}。</div>`}
+  </div>`;
+  if ($('#ov')) {
+    const base = S.list.filter(r => (!f.year || String(r.year) === String(f.year)) && (!f.term || String(r.term) === String(f.term)));
+    $('#ov').innerHTML = domains.map(d => {
+      const rs = base.filter(r => r.domain === d);
+      const sent = rs.filter(r => r.status !== '草稿');
+      const done = sent.filter(r => Object.keys(r.sign || {}).length >= 3).length;
+      const needFb = isOffice() ? sent.filter(r => !(r.feedback || {})[S.user.name]).length : sent.filter(r => Object.keys(r.feedback || {}).length < OFFICE_ORDER.length).length;
+      const needSign = isAdmin() ? sent.filter(r => !(r.sign || {})[S.user.name]).length : 0;
+      return `<div class="d ${rs.length ? '' : 'zero'} ${f.domain === d ? 'sel' : ''}" data-d="${esc(d)}"><b>${esc(d)}</b><div class="n">已送出 ${sent.length} 份${rs.length - sent.length ? `・草稿 ${rs.length - sent.length}` : ''}<br>${isOffice() ? `待本處回饋 ${needFb}` : `待回饋 ${needFb}・待我核章 ${needSign}`}<br>已核章 ${done}</div></div>`;
+    }).join('');
+    $$('#ov .d').forEach(el => el.onclick = () => { S.filter.domain = S.filter.domain === el.dataset.d ? '' : el.dataset.d; saveFilter(); showList(false); });
+  }
+  const bind = (id, k) => { const el = $(id); if (el) el.onchange = () => { S.filter[k] = el.value; saveFilter(); showList(false); }; };
+  bind('#fYear', 'year'); bind('#fTerm', 'term'); bind('#fDomain', 'domain'); bind('#fStatus', 'status');
+  $('#fReload').onclick = () => showList(true);
+  if ($('#btnNew')) $('#btnNew').onclick = () => showEditor(null);
+  if ($('#btnBatch')) $('#btnBatch').onclick = () => batchPdf(rows);
+  $$('[data-v]').forEach(b => b.onclick = () => showView(b.dataset.v));
+  $$('[data-e]').forEach(b => b.onclick = () => showEditor(b.dataset.e));
+  $$('[data-pdf]').forEach(b => b.onclick = () => exportPdf([b.dataset.pdf]));
+}
+const saveFilter = () => localStorage.setItem('xj_mt_filter', JSON.stringify(S.filter));
+
+/* ================= 編輯 ================= */
+const emptyProposal = () => ({ proposer: '', unit: '領域小組', cause: '', desc: '', method: '', result: '', yes: '', no: '', abstain: '', decision: '', owner: '', due: '' });
+const emptyMotion = () => ({ proposer: '', seconder: '', cause: '', decision: '' });
+
+async function showEditor(id) {
+  let r;
+  if (id) r = await run(() => api('get', { id }), '讀取中…');
+  else {
+    const { year, term } = rocNow();
+    const mine = S.list.filter(x => (isDomain() ? x.domain === S.user.name : true) && String(x.year) === String(year) && String(x.term) === String(term));
+    r = { year, term, no: String(isDomain() ? mine.length + 1 : 1), date: new Date().toISOString().slice(0, 10), timeStart: '13:40', timeEnd: '', placeType: '實體', place: '', link: '', chair: '', recorder: '', expected: '', present: '', leaveN: '', absentN: '', attendees: '', leaves: '', absents: '', signSheet: [], report: '', discussion: '', proposals: [emptyProposal()], motions: [], endTime: '', photos: [], status: '草稿', domain: isDomain() ? S.user.name : (S.filter.domain || '') };
+  }
+  r.proposals = r.proposals || []; r.motions = r.motions || []; r.photos = r.photos || []; r.signSheet = r.signSheet || [];
+  const ro = !isAdmin() && locked(r);
+  const v = k => esc(r[k] ?? '');
+  const inp = (k, label, type = 'text', extra = '') => `<label class="f">${label}<input type="${type}" data-k="${k}" value="${v(k)}" ${extra}></label>`;
+  const ta = (k, label, ph = '', rows = 4) => `<label class="f">${label}<textarea data-k="${k}" rows="${rows}" placeholder="${esc(ph)}">${v(k)}</textarea></label>`;
+
+  app.innerHTML = `<div class="card">
+    <div class="row noprint" style="margin-bottom:6px"><button class="btn sm" id="back">← 返回列表</button><div class="grow"></div><span class="muted">${r.id ? '編號 ' + esc(r.id) + '・' : ''}${esc(r.status)}</span></div>
+    <h2>${r.id ? '編輯' : '新增'}領域會議紀錄</h2>
+    ${ro ? '<div class="lockbar">此紀錄已進入核章流程，無法修改。如需更正請洽課程組。</div>' : ''}
+    <div id="form">
+    <div class="sec-title">一、基本資料</div>
+    <div class="grid g4">
+      ${isAdmin() ? `<label class="f">領域<select data-k="domain"><option value="">請選擇</option>${(S.meta?.domains || []).map(d => `<option ${d === r.domain ? 'selected' : ''}>${esc(d)}</option>`).join('')}</select></label>` : `<label class="f">領域<input type="text" value="${esc(r.domain)}" disabled></label>`}
+      ${inp('year', '學年度', 'number', 'min="100" max="200"')}
+      <label class="f">學期<select data-k="term"><option value="1" ${r.term == 1 ? 'selected' : ''}>第 1 學期</option><option value="2" ${r.term == 2 ? 'selected' : ''}>第 2 學期</option></select></label>
+      ${inp('no', '第幾次會議', 'number', 'min="1" max="30"')}
+      ${inp('date', '開會日期 *', 'date')}${inp('timeStart', '開始時間', 'time')}${inp('timeEnd', '結束時間', 'time')}
+      <label class="f">會議方式<select data-k="placeType">${['實體', '視訊', '實體＋視訊'].map(x => `<option ${x === r.placeType ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+    </div>
+    <div class="grid g2" style="margin-top:12px">
+      ${inp('place', '開會地點（實體）', 'text', 'placeholder="例：三樓會議室"')}
+      ${inp('link', '視訊連結（Google Meet 等）', 'url', 'placeholder="https://meet.google.com/..."')}
+      ${inp('chair', '主席 *')}${inp('recorder', '記錄人員 *')}
+    </div>
+    <div class="grid g4" style="margin-top:12px">${inp('expected', '應出席人數', 'number', 'min="0"')}${inp('present', '實到人數', 'number', 'min="0"')}${inp('leaveN', '請假人數', 'number', 'min="0"')}${inp('absentN', '缺席人數', 'number', 'min="0"')}</div>
+    <div class="grid" style="margin-top:12px">
+      ${ta('attendees', '出席人員', '輸入與會名單，或於下方上傳簽到表圖檔', 2)}
+      <div class="grid g2">${inp('leaves', '請假人員')}${inp('absents', '缺席人員')}</div>
+      <div><div class="muted" style="margin-bottom:6px">簽到表圖檔（可多張）</div><div class="photos" id="signSheetBox"></div></div>
+    </div>
+
+    <div class="sec-title">二、報告事項</div>
+    <div class="grid">${ta('report', '主席致詞與工作報告', '', 4)}${ta('discussion', '議題討論', '領域教學研究主題、課程計畫、教學進度、評量等報告與討論', 5)}</div>
+
+    <div class="sec-title">三、提案討論</div>
+    <div id="propBox"></div>
+    <button class="btn" id="addProp">＋ 新增提案</button>
+
+    <div class="sec-title">四、臨時動議</div>
+    <div id="motBox"></div>
+    <button class="btn" id="addMot">＋ 新增臨時動議</button> <span class="muted">（無臨時動議可不新增）</span>
+
+    <div class="sec-title">五、散會</div>
+    <div class="grid g4">${inp('endTime', '散會時間', 'time')}</div>
+    <p class="muted">記錄、主席簽章於匯出 PDF 後簽名；處室回饋與核章由各處室及管理者於系統中完成。</p>
+
+    <div class="sec-title">七、會議照片 <span class="muted" style="font-weight:400">（依議程活動紀錄 2–4 張，可自行增加）</span></div>
+    <div class="photos" id="photoBox"></div>
+    </div>
+    <div class="sticky-actions noprint">
+      ${r.id && (isAdmin() || r.status === '草稿') && !ro ? '<button class="btn danger" id="del">刪除</button>' : ''}
+      <div class="grow"></div>
+      <button class="btn" id="cancel">取消</button>
+      ${!ro ? `${r.status === '草稿' ? '<button class="btn" id="saveDraft">儲存草稿</button>' : ''}<button class="btn pri" id="submit">${r.status === '草稿' ? '送出紀錄' : '儲存修改'}</button>` : ''}
+    </div></div>`;
+
+  const form = $('#form');
+  if (ro) $$('input,select,textarea,button', form).forEach(el => el.disabled = true);
+
+  // 提案
+  const drawProps = () => {
+    $('#propBox').innerHTML = r.proposals.map((p, i) => `<div class="prop" data-i="${i}">
+      <div class="ph">提案${'一二三四五六七八九十'[i] || i + 1}<div class="grow"></div>${!ro ? `<button class="btn sm danger" data-rmp="${i}">移除</button>` : ''}</div>
+      <div class="grid g2"><label class="f">提案人<input type="text" data-p="proposer" value="${esc(p.proposer)}"></label>
+      <label class="f">提案單位<select data-p="unit">${['領域小組', '處室', '其他'].map(x => `<option ${x === p.unit ? 'selected' : ''}>${x}</option>`).join('')}</select></label></div>
+      <div class="grid" style="margin-top:10px">
+        <label class="f">案由<input type="text" data-p="cause" value="${esc(p.cause)}" placeholder="提出討論的主題或問題"></label>
+        <label class="f">說明<textarea data-p="desc" rows="3" placeholder="背景資料、現況分析或遭遇的困難">${esc(p.desc)}</textarea></label>
+        <label class="f">辦法<textarea data-p="method" rows="3" placeholder="具體的處理方式、執行步驟">${esc(p.method)}</textarea></label>
+        <div><div class="muted" style="margin-bottom:6px">決議結果</div><div class="chips">${['照案通過', '修正通過', '保留再議', '不通過'].map(x => `<label><input type="radio" name="res${i}" data-p="result" value="${x}" ${p.result === x ? 'checked' : ''}>${x}</label>`).join('')}</div></div>
+        <div class="grid g3"><label class="f">贊成票<input type="number" min="0" data-p="yes" value="${esc(p.yes)}"></label><label class="f">反對票<input type="number" min="0" data-p="no" value="${esc(p.no)}"></label><label class="f">棄權票<input type="number" min="0" data-p="abstain" value="${esc(p.abstain)}"></label></div>
+        <label class="f">決議內容／執行進度<textarea data-p="decision" rows="3">${esc(p.decision)}</textarea></label>
+        <div class="grid g2"><label class="f">負責人／單位<input type="text" data-p="owner" value="${esc(p.owner)}"></label><label class="f">預定完成日期<input type="date" data-p="due" value="${esc(p.due)}"></label></div>
+      </div></div>`).join('') || '<p class="muted">尚無提案。</p>';
+    $$('#propBox [data-p]').forEach(el => el.oninput = el.onchange = () => {
+      const i = +el.closest('.prop').dataset.i; if (el.type === 'radio') { if (el.checked) r.proposals[i].result = el.value; } else r.proposals[i][el.dataset.p] = el.value;
+    });
+    $$('[data-rmp]').forEach(b => b.onclick = async () => { if (await confirmBox('移除提案', '確定移除這個提案？', { danger: true, ok: '移除' })) { r.proposals.splice(+b.dataset.rmp, 1); drawProps(); } });
+    if (ro) $$('#propBox input,#propBox select,#propBox textarea,#propBox button').forEach(el => el.disabled = true);
+  };
+  const drawMots = () => {
+    $('#motBox').innerHTML = r.motions.map((m, i) => `<div class="prop" data-i="${i}">
+      <div class="ph">臨時動議${'一二三四五六七八九十'[i] || i + 1}<div class="grow"></div>${!ro ? `<button class="btn sm danger" data-rmm="${i}">移除</button>` : ''}</div>
+      <div class="grid g2"><label class="f">提案人<input type="text" data-m="proposer" value="${esc(m.proposer)}"></label><label class="f">附議人<input type="text" data-m="seconder" value="${esc(m.seconder)}"></label></div>
+      <div class="grid" style="margin-top:10px"><label class="f">案由<textarea data-m="cause" rows="2">${esc(m.cause)}</textarea></label><label class="f">決議<textarea data-m="decision" rows="2">${esc(m.decision)}</textarea></label></div></div>`).join('');
+    $$('#motBox [data-m]').forEach(el => el.oninput = () => { r.motions[+el.closest('.prop').dataset.i][el.dataset.m] = el.value; });
+    $$('[data-rmm]').forEach(b => b.onclick = () => { r.motions.splice(+b.dataset.rmm, 1); drawMots(); });
+    if (ro) $$('#motBox input,#motBox textarea,#motBox button').forEach(el => el.disabled = true);
+  };
+  drawProps(); drawMots();
+  $('#addProp').onclick = () => { r.proposals.push(emptyProposal()); drawProps(); };
+  $('#addMot').onclick = () => { r.motions.push(emptyMotion()); drawMots(); };
+
+  // 照片
+  const drawPhotos = (boxSel, arr, withCaption) => {
+    const box = $(boxSel);
+    box.innerHTML = arr.map((p, i) => `<div class="photo"><div class="im" data-pid="${esc(p.id)}">載入中…</div><div class="cap">${withCaption ? `<input type="text" placeholder="照片說明" data-cap="${i}" value="${esc(p.caption || '')}">` : '<span class="grow muted">簽到表 ' + (i + 1) + '</span>'}${!ro ? `<button class="btn sm danger" data-rm="${i}">✕</button>` : ''}</div></div>`).join('')
+      + (!ro ? `<label class="addph"><input type="file" accept="image/*" multiple hidden><span>＋ 上傳${withCaption ? '照片' : '簽到表'}</span></label>` : '');
+    $$('.im', box).forEach(async el => { try { const u = await photoUrl(el.dataset.pid); el.style.backgroundImage = `url("${u}")`; el.textContent = ''; } catch (e) { el.textContent = '無法載入'; } });
+    $$('[data-cap]', box).forEach(el => el.oninput = () => { arr[+el.dataset.cap].caption = el.value; });
+    $$('[data-rm]', box).forEach(b => b.onclick = () => { arr.splice(+b.dataset.rm, 1); drawPhotos(boxSel, arr, withCaption); });
+    const file = $('input[type=file]', box);
+    if (file) file.onchange = async () => {
+      const files = [...file.files]; if (!files.length) return;
+      try {
+        await run(async () => {
+          for (let k = 0; k < files.length; k++) {
+            busy(true, `上傳中 ${k + 1}/${files.length}…`);
+            const dataUrl = await shrink(files[k], withCaption ? 1600 : 2000);
+            const { id } = await api('uploadPhoto', { dataUrl, name: files[k].name });
+            S.photoCache[id] = dataUrl;
+            arr.push(withCaption ? { id, caption: '' } : { id });
+          }
+        });
+      } catch (e) { }
+      drawPhotos(boxSel, arr, withCaption);
+    };
+  };
+  drawPhotos('#signSheetBox', r.signSheet, false);
+  drawPhotos('#photoBox', r.photos, true);
+
+  const collect = () => {
+    $$('[data-k]', form).forEach(el => r[el.dataset.k] = el.value);
+    return r;
+  };
+  const doSave = async status => {
+    collect();
+    if (status === '已送出') {
+      const miss = [['date', '開會日期'], ['chair', '主席'], ['recorder', '記錄人員'], ['no', '次別']].filter(([k]) => !String(r[k] || '').trim()).map(x => x[1]);
+      if (isAdmin() && !r.domain) miss.unshift('領域');
+      if (miss.length) return toast('請填寫：' + miss.join('、'), 3500);
+      if (r.photos.length < 2 && !(await confirmBox('照片少於 2 張', '規定需附 2–4 張會議照片，仍要送出嗎？', { ok: '仍要送出' }))) return;
+    } else if (isAdmin() && !r.domain) return toast('請選擇領域');
+    const payload = Object.assign({}, r, { status: r.status === '草稿' ? status : r.status });
+    delete payload.feedback; delete payload.sign;
+    const saved = await run(() => api('save', { record: payload }), '儲存中…');
+    toast(status === '已送出' && r.status === '草稿' ? '已送出，通知處室回饋' : '已儲存');
+    if (status === '草稿' && !r.id) { showEditor(saved.id); return; }
+    showView(saved.id);
+  };
+  $('#back').onclick = $('#cancel').onclick = () => showList();
+  if ($('#saveDraft')) $('#saveDraft').onclick = () => doSave('草稿').catch(() => { });
+  if ($('#submit')) $('#submit').onclick = () => doSave('已送出').catch(() => { });
+  if ($('#del')) $('#del').onclick = async () => {
+    if (!(await confirmBox('刪除紀錄', '刪除後無法復原，確定刪除？', { danger: true, ok: '刪除' }))) return;
+    await run(() => api('remove', { id: r.id })); toast('已刪除'); showList();
+  };
+}
+
+function shrink(file, max) {
+  return new Promise((res, rej) => {
+    const img = new Image(), fr = new FileReader();
+    fr.onload = () => { img.src = fr.result; };
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+      res(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => rej(new Error('無法讀取圖片：' + file.name));
+    fr.readAsDataURL(file);
+  });
+}
+async function photoUrl(id) {
+  if (!S.photoCache[id]) S.photoCache[id] = (await api('photo', { id })).dataUrl;
+  return S.photoCache[id];
+}
+
+/* ================= 紀錄表樣式（檢視／PDF 共用） ================= */
+function sheetHtml(r) {
+  const T = s => `<div class="pre">${esc(s)}</div>`;
+  const ck = (on, label) => `${on ? '☑' : '☐'}${label}`;
+  const props = (r.proposals || []).length ? r.proposals.map((p, i) => `
+    <tr><td class="p" colspan="4">提案${'一二三四五六七八九十'[i] || i + 1}</td></tr>
+    <tr><td class="l">提案人</td><td>${esc(p.proposer)}</td><td class="l">提案單位</td><td>${['領域小組', '處室', '其他'].map(x => ck(p.unit === x, x)).join('　')}</td></tr>
+    <tr><td class="l">案　由</td><td colspan="3">${T(p.cause)}</td></tr>
+    <tr><td class="l">說　明</td><td colspan="3">${T(p.desc)}</td></tr>
+    <tr><td class="l">辦　法</td><td colspan="3">${T(p.method)}</td></tr>
+    <tr><td class="l">決　議</td><td colspan="3">${['照案通過', '修正通過', '保留再議', '不通過'].map(x => ck(p.result === x, x)).join('　')}
+      ${p.yes || p.no || p.abstain ? `<div>表決結果：贊成 ${esc(p.yes || 0)} 票、反對 ${esc(p.no || 0)} 票、棄權 ${esc(p.abstain || 0)} 票</div>` : ''}
+      ${T(p.decision)}${p.owner || p.due ? `<div>負責人／單位：${esc(p.owner)}　預定完成：${p.due ? rocDateText(p.due).replace(/（.*）/, '') : ''}</div>` : ''}</td></tr>`).join('')
+    : `<tr><td colspan="4">無</td></tr>`;
+  const mots = (r.motions || []).length ? r.motions.map((m, i) => `
+    <tr><td class="p" colspan="4">臨時動議${'一二三四五六七八九十'[i] || i + 1}</td></tr>
+    <tr><td class="l">提案人</td><td>${esc(m.proposer)}</td><td class="l">附議人</td><td>${esc(m.seconder)}</td></tr>
+    <tr><td class="l">案　由</td><td colspan="3">${T(m.cause)}</td></tr>
+    <tr><td class="l">決　議</td><td colspan="3">${T(m.decision)}</td></tr>`).join('')
+    : `<tr><td colspan="4">無</td></tr>`;
+  const fb = r.feedback || {};
+  const sg = r.sign || {};
+  const photos = r.photos || [];
+  const cells = photos.length ? photos : [{}, {}, {}, {}];
+  const img = id => id && S.photoCache[id] ? `<img src="${S.photoCache[id]}">` : '<span style="color:#bbb">（照片）</span>';
+  const place = [];
+  if (r.placeType !== '視訊') place.push(`${ck(true, '實體')}：${esc(r.place)}`);
+  if (r.placeType !== '實體') place.push(`${ck(true, '視訊')}：${r.link ? esc(r.link) : 'Google Meet'}`);
+  return `<div class="sheet">
+  <div class="hd"><img src="${LOGO}"></div>
+  <div class="ttl">${esc(r.year)} 學年度第 ${esc(r.term)} 學期　興嘉國小 ${esc(r.domain)} 領域會議　第 ${esc(r.no)} 次會議紀錄</div>
+  <table>
+    <colgroup><col style="width:110px"><col><col style="width:110px"><col></colgroup>
+    <tr><td class="s" colspan="4">一、基本資料</td></tr>
+    <tr><td class="l">開會日期</td><td>${rocDateText(r.date)}</td><td class="l">起迄時間</td><td>${esc(r.timeStart)} 至 ${esc(r.timeEnd)}</td></tr>
+    <tr><td class="l">開會地點</td><td colspan="3">${place.join('<br>')}</td></tr>
+    <tr><td class="l">主　　席</td><td>${esc(r.chair)}</td><td class="l">記錄人員</td><td>${esc(r.recorder)}</td></tr>
+    <tr><td class="l">出席情形</td><td colspan="3">應出席 ${esc(r.expected || '　')} 人　實到 ${esc(r.present || '　')} 人　請假 ${esc(r.leaveN || '　')} 人　缺席 ${esc(r.absentN || '　')} 人</td></tr>
+    <tr><td class="l">出席人員</td><td colspan="3">${T(r.attendees)}${(r.signSheet || []).length ? `<div class="signimg">${r.signSheet.map(s => img(s.id)).join('')}</div>` : ''}</td></tr>
+    <tr><td class="l">請假人員</td><td>${esc(r.leaves)}</td><td class="l">缺席人員</td><td>${esc(r.absents)}</td></tr>
+    <tr><td class="s" colspan="4">二、報告事項</td></tr>
+    <tr><td class="l">主席致詞與<br>工作報告</td><td colspan="3"><div class="pre tall">${esc(r.report)}</div></td></tr>
+    <tr><td class="l">議題討論</td><td colspan="3"><div class="pre tall">${esc(r.discussion)}</div></td></tr>
+    <tr><td class="s" colspan="4">三、提案討論</td></tr>${props}
+    <tr><td class="s" colspan="4">四、臨時動議</td></tr>${mots}
+    <tr><td class="s" colspan="4">五、散會</td></tr>
+    <tr><td class="l">散會時間</td><td colspan="3">${esc(r.endTime)}</td></tr>
+    <tr><td class="l">記錄簽章</td><td class="sig"></td><td class="l">主席簽章</td><td class="sig"></td></tr>
+  </table>
+  <table class="fbt" style="page-break-inside:avoid;margin-top:-1px">
+    <colgroup><col style="width:110px"><col><col style="width:110px"><col></colgroup>
+    <tr><td class="s" colspan="4">六、處室回饋</td></tr>
+    ${OFFICE_ORDER.map(o => `<tr><td class="l">${o}</td><td colspan="3">${fb[o] ? `${T(fb[o].text)}<div style="text-align:right;color:#666;font-size:12px">${esc(fb[o].by)}　${fmtDT(fb[o].at)}</div>` : '<div class="tall"></div>'}</td></tr>`).join('')}
+  </table>
+  <div class="notes"><b>說明：</b>${NOTES.map(n => `<div style="padding-left:2em;text-indent:-2em">${esc(n)}</div>`).join('')}</div>
+  <div class="pagebreak"></div>
+  <div class="gap"></div>
+  <table><tr><td class="s">七、會議照片 <span style="font-weight:400;color:#555;font-size:12.5px">（依議程活動紀錄 2–4 張）</span></td></tr></table>
+  <div class="phgrid">${cells.map(p => `<div class="phc"><div class="pi">${img(p.id)}</div><div class="pc">照片說明：${esc(p.caption || '')}</div></div>`).join('')}${cells.length % 2 ? '<div class="phc"><div class="pi"></div><div class="pc">照片說明：</div></div>' : ''}</div>
+  <div class="gap"></div>
+  <table style="page-break-inside:avoid">
+    <tr><td class="s" colspan="3">八、核章</td></tr>
+    <tr>${ADMIN_ORDER.map(a => `<td class="l" style="width:auto">${a === '校長' ? '校　長' : a}</td>`).join('')}</tr>
+    <tr>${ADMIN_ORDER.map(a => `<td class="sig" style="height:90px">${sg[a] ? `<span class="stamp">${esc(a)} 已核閱<small>${fmtDT(sg[a].at)}</small></span>` : ''}</td>`).join('')}</tr>
+  </table>
+  </div>`;
+}
+async function preloadPhotos(r) {
+  const ids = [...(r.photos || []), ...(r.signSheet || [])].map(p => p.id).filter(Boolean);
+  await Promise.all(ids.map(id => photoUrl(id).catch(() => null)));
+}
+
+/* ================= 檢視 ================= */
+async function showView(id) {
+  const r = await run(async () => { const x = await api('get', { id }); await preloadPhotos(x); return x; }, '讀取中…');
+  const canE = isAdmin() || (isDomain() && !locked(r));
+  const st = statusOf(r);
+  const myFb = isOffice() ? ((r.feedback || {})[S.user.name]?.text || '') : '';
+  const mySign = isAdmin() && (r.sign || {})[S.user.name];
+  app.innerHTML = `<div class="card noprint">
+    <div class="row"><button class="btn sm" id="back">← 返回列表</button>
+      <b style="margin-left:6px">${esc(r.domain)}｜${esc(r.year)}-${esc(r.term)} 第 ${esc(r.no)} 次</b><span class="tag ${st.c}">${st.t}</span>
+      <div class="grow"></div>
+      ${canE ? '<button class="btn" id="edit">編輯</button>' : ''}
+      <button class="btn" id="print">列印</button>
+      <button class="btn pri" id="pdf">📄 匯出 PDF</button>
+    </div>
+    ${isOffice() && r.status !== '草稿' ? `<div style="margin-top:14px"><h3>${esc(S.user.name)}回饋</h3><textarea id="fbText" rows="3" placeholder="輸入本處室對此會議紀錄的回饋或回覆…">${esc(myFb)}</textarea><div class="row" style="margin-top:8px"><div class="grow"></div><button class="btn pri" id="fbSave">儲存回饋</button></div></div>` : ''}
+    ${isAdmin() && r.status !== '草稿' ? `<div class="row" style="margin-top:14px"><span class="muted">核章（${esc(S.user.name)}）：</span>${mySign ? `<span class="tag done">已核閱 ${fmtDT(mySign.at)}</span><button class="btn sm" id="unsign">撤回核章</button>` : '<button class="btn ok" id="sign">✔ 核章（已閱）</button>'}</div>` : ''}
+    ${r.status === '草稿' ? '<div class="lockbar" style="margin:12px 0 0">此紀錄為草稿，尚未送出；處室無法回饋、管理者無法核章。</div>' : ''}
+  </div>
+  <div class="viewwrap">${sheetHtml(r)}</div>`;
+  $('#back').onclick = () => showList();
+  if ($('#edit')) $('#edit').onclick = () => showEditor(id);
+  $('#print').onclick = () => window.print();
+  $('#pdf').onclick = () => exportPdf([id], r);
+  if ($('#fbSave')) $('#fbSave').onclick = async () => { await run(() => api('feedback', { id, text: $('#fbText').value })); toast('回饋已儲存'); showView(id); };
+  if ($('#sign')) $('#sign').onclick = async () => { await run(() => api('approve', { id, approve: true })); toast('已核章'); showView(id); };
+  if ($('#unsign')) $('#unsign').onclick = async () => { if (await confirmBox('撤回核章', '確定撤回您的核章？')) { await run(() => api('approve', { id, approve: false })); showView(id); } };
+}
+
+/* ================= PDF 匯出 ================= */
+async function exportPdf(ids, preloaded) {
+  if (typeof html2pdf === 'undefined') return toast('PDF 元件載入失敗，請改用「列印」→另存為 PDF', 4000);
+  try {
+    busy(true, '產生 PDF 中…');
+    const recs = [];
+    for (let i = 0; i < ids.length; i++) {
+      busy(true, `準備資料 ${i + 1}/${ids.length}…`);
+      const r = preloaded && ids.length === 1 ? preloaded : await api('get', { id: ids[i] });
+      await preloadPhotos(r); recs.push(r);
+    }
+    busy(true, '產生 PDF 中，請稍候…');
+    const outer = document.createElement('div');
+    outer.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:hidden';
+    const wrap = document.createElement('div');
+    wrap.className = 'pdfwrap';
+    wrap.style.cssText = 'width:718px;background:#fff';
+    wrap.innerHTML = recs.map((r, i) => (i ? '<div class="pagebreak"></div>' : '') + sheetHtml(r)).join('');
+    outer.appendChild(wrap); document.body.appendChild(outer);
+    window.scrollTo(0, 0);
+    await Promise.all($$('img', wrap).map(im => im.complete ? 0 : new Promise(res => { im.onload = im.onerror = res; })));
+    const r0 = recs[0];
+    const name = recs.length === 1 ? `${r0.year}-${r0.term}_${r0.domain}領域會議_第${r0.no}次.pdf` : `領域會議紀錄_${S.filter.year || '全部'}-${S.filter.term || ''}_${recs.length}份.pdf`;
+    await html2pdf().set({
+      margin: [10, 10, 10, 10], filename: name,
+      image: { type: 'jpeg', quality: 0.92 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'], before: '.pagebreak', avoid: ['tr', '.phc', '.notes', '.fbt'] },
+    }).from(wrap).save();
+    outer.remove();
+    toast('PDF 已下載');
+  } catch (e) { toast('⚠ ' + e.message, 4000); }
+  finally { busy(false); }
+}
+async function batchPdf(rows) {
+  const list = rows.filter(r => r.status !== '草稿');
+  if (!list.length) return toast('沒有已送出的紀錄可匯出');
+  if (!(await confirmBox('匯出 PDF', `將篩選結果中已送出的 ${list.length} 份紀錄合併成一個 PDF（草稿不列入）。份數多時需要較長時間。`, { ok: '開始匯出' }))) return;
+  exportPdf(list.map(r => r.id));
+}
+
+/* ================= 帳號管理（密碼一律由管理者設定） ================= */
+function genPw(n = 6) {
+  const cs = 'abcdefghjkmnpqrstuvwxyz23456789';  // 去除易混淆字元 0 o 1 l i
+  const a = crypto.getRandomValues(new Uint32Array(n));
+  return [...a].map(x => cs[x % cs.length]).join('');
+}
+function showPwList(list) {
+  const text = list.map(x => `${x.role}\t${x.name}\t${x.pw}`).join('\n');
+  modal({
+    title: '新密碼（請立即抄錄或複製）', ok: '我已記下', cancel: '',
+    html: `<p class="muted">密碼只會顯示這一次，關閉後無法再查看。</p>
+      <div style="max-height:50vh;overflow:auto"><table class="list"><thead><tr><th>角色</th><th>帳號</th><th>密碼</th></tr></thead><tbody>
+      ${list.map(x => `<tr><td>${esc(x.role)}</td><td>${esc(x.name)}</td><td style="font-family:Consolas,monospace;font-size:16px;letter-spacing:1px"><b>${esc(x.pw)}</b></td></tr>`).join('')}
+      </tbody></table></div>
+      <div class="row" style="margin-top:10px"><button class="btn sm" id="cpPw">📋 複製全部（可貼到試算表）</button><button class="btn sm" id="prPw">🖨 列印密碼條</button></div>`,
+    onOpen: m => {
+      $('#cpPw', m).onclick = () => navigator.clipboard.writeText('角色\t帳號\t密碼\n' + text).then(() => toast('已複製'), () => toast('複製失敗，請手動抄錄'));
+      $('#prPw', m).onclick = () => {
+        const w = window.open('', '_blank');
+        if (!w) return toast('瀏覽器擋住了彈出視窗');
+        w.document.write(`<html><head><meta charset="utf-8"><title>領域會議紀錄系統 帳號密碼</title><style>body{font-family:"微軟正黑體",sans-serif;padding:20px}.c{display:inline-block;width:46%;margin:6px 1%;border:1px dashed #888;padding:12px 14px;box-sizing:border-box;page-break-inside:avoid}.c b{font-size:20px;font-family:Consolas,monospace;letter-spacing:2px}</style></head><body>
+          ${list.map(x => `<div class="c">興嘉國小 領域會議紀錄系統<br>網址：${esc(location.href.split('?')[0])}<br>身分：${esc(x.role)}　帳號：<b style="font-family:inherit;letter-spacing:0">${esc(x.name)}</b><br>密碼：<b>${esc(x.pw)}</b></div>`).join('')}
+          <script>print()<\/script></body></html>`);
+        w.document.close();
+      };
+    },
+  });
+}
+
+async function showAccounts() {
+  const accs = await run(() => api('accounts'));
+  const roles = ['領域', '處室', '管理者'];
+  app.innerHTML = `<div class="card">
+    <div class="row" style="margin-bottom:6px"><button class="btn sm" id="back">← 返回列表</button><h2 style="margin:0 0 0 8px">帳號與密碼管理</h2></div>
+    <p class="muted" style="margin:0 0 14px">所有帳號（含課程組、教務主任、校長）的密碼都由管理者在此設定，使用者無法自行修改。系統只存密碼雜湊，設定後無法再查看原密碼，請於產生當下抄錄或列印發給使用者。</p>
+    <div class="row" style="margin-bottom:14px">
+      <button class="btn pri" id="genSel" disabled>🔑 為勾選帳號產生新密碼</button>
+      <button class="btn sm" data-selrole="領域">勾選全部領域</button>
+      <button class="btn sm" data-selrole="處室">勾選全部處室</button>
+      <button class="btn sm" data-selrole="管理者">勾選全部管理者</button>
+      <button class="btn sm" id="selNone">取消勾選</button>
+    </div>
+    ${roles.map(role => `<h3 style="margin-top:18px">${role}</h3>
+    <table class="list" style="table-layout:fixed"><thead><tr><th style="width:40px"></th><th style="width:28%">帳號</th><th style="width:24%">密碼狀態</th><th style="width:20%">最後設定</th><th></th></tr></thead><tbody>
+    ${accs.map((a, i) => a.role !== role ? '' : `<tr><td><input type="checkbox" data-ck="${i}"></td><td>${esc(a.name)}${a.role === S.user.role && a.name === S.user.name ? ' <span class="tag">目前登入</span>' : ''}</td>
+      <td>${a.isDefault ? '<span class="tag draft">初始密碼，尚未設定</span>' : '<span class="tag done">已設定</span>'}</td><td class="muted">${fmtDT(a.updatedAt)}</td>
+      <td style="text-align:right;white-space:nowrap"><button class="btn sm" data-set="${i}">設定密碼</button> <button class="btn sm danger" data-rm="${i}">刪除</button></td></tr>`).join('')}
+    </tbody></table>`).join('')}
+    <div class="sec-title">新增帳號</div>
+    <div class="row">
+      <select id="nRole" style="width:auto">${roles.map(r => `<option>${r}</option>`).join('')}</select>
+      <input type="text" id="nName" placeholder="帳號名稱（例：學年會議）" style="width:220px">
+      <button class="btn pri" id="nAdd">新增並產生密碼</button>
+    </div></div>`;
+  $('#back').onclick = () => showList();
+  const cks = () => $$('[data-ck]:checked').map(c => accs[+c.dataset.ck]);
+  const upd = () => { const n = cks().length; $('#genSel').disabled = !n; $('#genSel').textContent = `🔑 為勾選帳號產生新密碼${n ? `（${n}）` : ''}`; };
+  $$('[data-ck]').forEach(c => c.onchange = upd);
+  $$('[data-selrole]').forEach(b => b.onclick = () => { $$('[data-ck]').forEach(c => { if (accs[+c.dataset.ck].role === b.dataset.selrole) c.checked = true; }); upd(); });
+  $('#selNone').onclick = () => { $$('[data-ck]').forEach(c => c.checked = false); upd(); };
+  const apply = async list => {
+    const items = await Promise.all(list.map(async x => ({ role: x.role, name: x.name, newHash: await sha256(x.pw) })));
+    await run(() => api('setPasswords', { items }), '設定密碼中…');
+  };
+  $('#genSel').onclick = async () => {
+    const sel = cks();
+    const self = sel.some(a => a.role === S.user.role && a.name === S.user.name);
+    if (!(await confirmBox('產生新密碼', `將為 ${sel.length} 個帳號產生新的隨機密碼，舊密碼立即失效。${self ? '（包含您目前登入的帳號）' : ''}`, { ok: '產生' }))) return;
+    const list = sel.map(a => ({ role: a.role, name: a.name, pw: genPw() }));
+    await apply(list);
+    showPwList(list); showAccounts();
+  };
+  $$('[data-set]').forEach(b => b.onclick = async () => {
+    const a = accs[+b.dataset.set];
+    const m = await modal({
+      title: `設定「${a.role}｜${a.name}」密碼`, ok: '儲存',
+      html: `<label class="f">新密碼（至少 6 碼）<div class="row"><input type="text" id="np" class="grow" style="width:auto;font-family:Consolas,monospace" value="${genPw()}"><button class="btn sm" id="rg">重新產生</button></div></label><p class="muted">可直接使用隨機密碼，或改成自訂密碼。</p>`,
+      onOpen: m => { $('#rg', m).onclick = () => { $('#np', m).value = genPw(); }; },
+    });
+    if (!m) return;
+    const pw = $('#np', m).value.trim();
+    if (pw.length < 6) return toast('密碼至少 6 碼');
+    await apply([{ role: a.role, name: a.name, pw }]);
+    showPwList([{ role: a.role, name: a.name, pw }]); showAccounts();
+  });
+  $$('[data-rm]').forEach(b => b.onclick = async () => {
+    const a = accs[+b.dataset.rm];
+    if (!(await confirmBox('刪除帳號', `確定刪除「${a.role}｜${a.name}」？既有會議紀錄不會被刪除。`, { danger: true, ok: '刪除' }))) return;
+    await run(() => api('removeAccount', { role: a.role, name: a.name })); S.meta = await api('meta'); showAccounts();
+  });
+  $('#nAdd').onclick = async () => {
+    const name = $('#nName').value.trim(); if (!name) return toast('請輸入名稱');
+    const role = $('#nRole').value, pw = genPw();
+    await run(async () => api('addAccount', { role, name, newHash: await sha256(pw) }));
+    S.meta = await api('meta'); showPwList([{ role, name, pw }]); showAccounts();
+  };
+}
+
+/* ================= 啟動 ================= */
+(async () => {
+  setHeader();
+  if (S.token && S.user) {
+    try { S.meta = await api('meta'); await showList(); } catch (e) { showLogin(); }
+  } else showLogin();
+})();
+</script>
+</body>
+</html>
